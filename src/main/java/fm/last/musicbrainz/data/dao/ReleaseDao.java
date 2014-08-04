@@ -15,10 +15,11 @@
  */
 package fm.last.musicbrainz.data.dao;
 
-import java.util.List;
-
 import fm.last.musicbrainz.data.model.Artist;
+import fm.last.musicbrainz.data.model.Recording;
 import fm.last.musicbrainz.data.model.Release;
+
+import java.util.List;
 
 /**
  * Provides access to {@link Release}s.
@@ -39,4 +40,9 @@ public interface ReleaseDao extends MusicBrainzDao<Release> {
    */
   List<Release> getByArtistAndName(Artist artist, String releaseName);
 
+  List<Release> getByNameAndArtistNames(String releaseName, String... artistNames);
+
+   List<Release> getByRecording(Recording recording);
+
+	List<Release> getByIsrc(String isrc);
 }

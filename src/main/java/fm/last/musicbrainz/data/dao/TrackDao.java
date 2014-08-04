@@ -15,10 +15,11 @@
  */
 package fm.last.musicbrainz.data.dao;
 
-import java.util.List;
-
 import fm.last.musicbrainz.data.model.Artist;
+import fm.last.musicbrainz.data.model.Recording;
 import fm.last.musicbrainz.data.model.Track;
+
+import java.util.List;
 
 /**
  * Provides access to {@link Track}s.
@@ -39,4 +40,7 @@ public interface TrackDao extends MusicBrainzDao<Track> {
    */
   List<Track> getByArtist(Artist artist);
 
+	List<Track> getByRecording(Recording recording);
+
+	List<Track> getByArtistNameAndName(String[] artistNames, String trackName);
 }

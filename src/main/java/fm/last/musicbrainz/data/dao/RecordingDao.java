@@ -15,10 +15,10 @@
  */
 package fm.last.musicbrainz.data.dao;
 
-import java.util.List;
-
 import fm.last.musicbrainz.data.model.Artist;
 import fm.last.musicbrainz.data.model.Recording;
+
+import java.util.List;
 
 /**
  * Provides access to {@link Recording}s.
@@ -36,4 +36,6 @@ public interface RecordingDao extends MusicBrainzDao<Recording> {
    * @return Empty list if {@link Artist} has no {@link Recording}s
    */
   List<Recording> getByArtist(Artist artist);
+
+	List<Recording> getByIsrc(String isrc);
 }

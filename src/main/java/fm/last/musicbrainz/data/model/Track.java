@@ -15,28 +15,16 @@
  */
 package fm.last.musicbrainz.data.model;
 
-import java.util.Set;
-import java.util.UUID;
-
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import javax.persistence.*;
+import java.util.Set;
+import java.util.UUID;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -61,6 +49,10 @@ public class Track {
   @ManyToOne(targetEntity = ArtistCredit.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "artist_credit", nullable = true)
   private ArtistCredit artistCredit;
+
+	@OneToOne(targetEntity = Medium.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "medium", nullable = true)
+	private Medium medium;
 
   @Column(name = "position")
   private int position;
@@ -106,7 +98,11 @@ public class Track {
     return recording;
   }
 
-  /**
+	public Medium getMedium() {
+		return medium;
+	}
+
+	/**
    * Length in milliseconds.
    */
   public Integer getLength() {
@@ -124,4 +120,19 @@ public class Track {
     return new ImmutableSet.Builder<UUID>().addAll(redirectedGids).add(gid).build();
   }
 
+	@Override
+	public String toString() {
+		return "Track{" +
+				"id=" + id +
+				", gid=" + gid +
+				", redirectedGids=" + redirectedGids +
+				", artistCredit=" + artistCredit +
+				", position=" + position +
+				", number='" + number + '\'' +
+				", name='" + name + '\'' +
+				", recording=" + recording +
+				", length=" + length +
+				", lastUpdated=" + lastUpdated +
+				'}';
+	}
 }

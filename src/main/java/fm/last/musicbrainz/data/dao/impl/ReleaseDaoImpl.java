@@ -15,16 +15,16 @@
  */
 package fm.last.musicbrainz.data.dao.impl;
 
-import java.util.List;
-import java.util.UUID;
-
+import fm.last.musicbrainz.data.dao.ReleaseDao;
+import fm.last.musicbrainz.data.model.Artist;
+import fm.last.musicbrainz.data.model.Recording;
+import fm.last.musicbrainz.data.model.Release;
 import org.hibernate.type.PostgresUUIDType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import fm.last.musicbrainz.data.dao.ReleaseDao;
-import fm.last.musicbrainz.data.model.Artist;
-import fm.last.musicbrainz.data.model.Release;
+import java.util.List;
+import java.util.UUID;
 
 @Repository("musicBrainzReleaseDaoImpl")
 @Transactional("musicBrainzTransactionManager")
@@ -56,10 +56,34 @@ public class ReleaseDaoImpl extends AbstractMusicBrainzHibernateDao<Release> imp
 
   @Override
   public List<Release> getByArtistAndName(Artist artist, String releaseName) {
-    return list(query(
-        "select release from " + Release.class.getName()
-            + " release join release.artistCredit.artistCreditNames artistCreditNames"
-            + " where artistCreditNames.artist.id = :artistId and upper(release.name) = upper(:name)").setInteger(
-        "artistId", artist.getId()).setString("name", releaseName));
+	return list(query(
+		"select release from " + Release.class.getName()
+			+ " release join release.artistCredit.artistCreditNames artistCreditNames"
+			+ " where artistCreditNames.artist.id = :artistId and upper(release.name) = upper(:name)").setInteger(
+		"artistId", artist.getId()).setString("name", releaseName));
   }
+
+	@Override
+	public List<Release> getByNameAndArtistNames(String releaseName, String... artistNames) {//FIXME it checks only the first artist
+		return list(query(
+				"select release from " + Release.class.getName()
+						+ " release join release.artistCredit.artistCreditNames artistCreditNames"
+						+ " where upper(artistCreditNames.artist.name) = upper(:artistName) and upper(release.name) = upper(:name)").setString(
+				"artistName", artistNames[0]).setString("name", releaseName));
+		/*return list(query("select release from Release release join artist_credit_name artistCreditNames on artistCreditNames.name = :artistName and upper(release.name) = upper(:releaseName)").setString(
+				"artistName", artistNames[0]).setString("releaseName", releaseName));*/
+	}
+
+	@Override
+	public List<Release> getByRecording(Recording recording) {//TODO use joins instead
+		return list(query(
+				"SELECT r from Release r where r.id IN (select release FROM Medium m where m.id IN (select distinct t.medium from Track t where t.recording = :recordingId))").setInteger("recordingId", recording.getId()));
+	}
+
+	@Override
+	public List<Release> getByIsrc(String isrc) {//TODO use joins instead
+		return list(query(
+				"SELECT r from Release r where r.id IN (select release FROM Medium m where m.id IN (select distinct t.medium from Track t where t.recording IN (SELECT recording from Isrc  where isrc = :isrc)))").setString("isrc", isrc));
+	}
+
 }

@@ -15,16 +15,16 @@
  */
 package fm.last.musicbrainz.data.dao.impl;
 
-import java.util.List;
-import java.util.UUID;
-
+import fm.last.musicbrainz.data.dao.TrackDao;
+import fm.last.musicbrainz.data.model.Artist;
+import fm.last.musicbrainz.data.model.Recording;
+import fm.last.musicbrainz.data.model.Track;
 import org.hibernate.type.PostgresUUIDType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import fm.last.musicbrainz.data.dao.TrackDao;
-import fm.last.musicbrainz.data.model.Artist;
-import fm.last.musicbrainz.data.model.Track;
+import java.util.List;
+import java.util.UUID;
 
 @Repository("musicBrainzTrackDaoImpl")
 @Transactional("musicBrainzTransactionManager")
@@ -62,4 +62,24 @@ public class TrackDaoImpl extends AbstractMusicBrainzHibernateDao<Track> impleme
             + " where artistCreditNames.artist.id = :artistId and upper(track.name) = upper(:name)").setInteger(
         "artistId", artist.getId()).setString("name", trackName));
   }
+
+	@Override
+	public List<Track> getByRecording(Recording recording) {
+		return list(query(
+				"select distinct track from " + Track.class.getSimpleName()
+						+ " track join track.recording recording"
+						+ " where recording.id = :recordingId").setInteger("recordingId", recording.getId()));
+	}
+
+	@Override
+	public List<Track> getByArtistNameAndName(String[] artistNames, String trackName) { //FIXME only using the first artist
+		return list(query(
+				"select track from " + Track.class.getName()
+						+ " track join track.artistCredit.artistCreditNames artistCreditNames"
+						+ " where upper(artistCreditNames.artist.name) = upper(:artistName) and upper(track.name) = upper(:name)").setString(
+				"artistName", artistNames[0]).setString("name", trackName));
+	}
+
+
+
 }

@@ -15,16 +15,16 @@
  */
 package fm.last.musicbrainz.data.dao.impl;
 
-import java.util.List;
-import java.util.UUID;
-
+import fm.last.musicbrainz.data.dao.RecordingDao;
+import fm.last.musicbrainz.data.model.Artist;
+import fm.last.musicbrainz.data.model.Isrc;
+import fm.last.musicbrainz.data.model.Recording;
 import org.hibernate.type.PostgresUUIDType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import fm.last.musicbrainz.data.dao.RecordingDao;
-import fm.last.musicbrainz.data.model.Artist;
-import fm.last.musicbrainz.data.model.Recording;
+import java.util.List;
+import java.util.UUID;
 
 @Repository("musicBrainzRecordingDaoImpl")
 @Transactional("musicBrainzTransactionManager")
@@ -62,5 +62,13 @@ public class RecordingDaoImpl extends AbstractMusicBrainzHibernateDao<Recording>
             + " recording join recording.artistCredit.artistCreditNames artistCreditNames"
             + " where artistCreditNames.artist.id = :artistId").setInteger("artistId", artist.getId()));
   }
+
+	@Override
+	public List<Recording> getByIsrc(String isrc) {
+		return list(query(
+				"select recording from " + Isrc.class.getName()
+						+ " where isrc = :isrc").setString("isrc", isrc));
+
+	}
 
 }
